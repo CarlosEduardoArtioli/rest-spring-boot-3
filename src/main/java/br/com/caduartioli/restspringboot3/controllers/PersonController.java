@@ -1,6 +1,6 @@
 package br.com.caduartioli.restspringboot3.controllers;
 
-import br.com.caduartioli.restspringboot3.model.Person;
+import br.com.caduartioli.restspringboot3.data.vo.v1.PersonVO;
 import br.com.caduartioli.restspringboot3.services.PersonServices;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
@@ -18,24 +18,24 @@ public class PersonController {
 
     @GetMapping(value = "/{id}",
             produces = MediaType.APPLICATION_JSON_VALUE)
-    public Person findById(@PathVariable(value = "id") Long id) {
+    public PersonVO findById(@PathVariable(value = "id") Long id) {
         return personServices.findById(id);
     }
 
     @GetMapping(produces = MediaType.APPLICATION_JSON_VALUE)
-    public List<Person> findAll() {
+    public List<PersonVO> findAll() {
         return personServices.findAll();
     }
 
     @PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE,
             produces = MediaType.APPLICATION_JSON_VALUE)
-    public Person create(@RequestBody Person person) {
+    public PersonVO create(@RequestBody PersonVO person) {
         return personServices.create(person);
     }
 
     @PutMapping(consumes = MediaType.APPLICATION_JSON_VALUE,
             produces = MediaType.APPLICATION_JSON_VALUE)
-    public Person update(@RequestBody Person person) {
+    public PersonVO update(@RequestBody PersonVO person) {
         return personServices.update(person);
     }
 
