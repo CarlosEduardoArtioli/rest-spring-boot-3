@@ -1,8 +1,10 @@
 package br.com.caduartioli.restspringboot3.services;
 
 import br.com.caduartioli.restspringboot3.data.vo.v1.PersonVO;
+import br.com.caduartioli.restspringboot3.data.vo.v2.PersonVOV2;
 import br.com.caduartioli.restspringboot3.exceptions.ResourceNotFoundException;
 import br.com.caduartioli.restspringboot3.mapper.DozerMapper;
+import br.com.caduartioli.restspringboot3.mapper.custom.PersonMapper;
 import br.com.caduartioli.restspringboot3.model.Person;
 import br.com.caduartioli.restspringboot3.repositories.PersonRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,6 +19,9 @@ public class PersonServices {
 
     @Autowired
     PersonRepository personRepository;
+
+    @Autowired
+    PersonMapper mapper;
 
     public List<PersonVO> findAll() {
         logger.info("Finding all people!");
@@ -66,5 +71,15 @@ public class PersonServices {
                 .orElseThrow(() -> new ResourceNotFoundException("No records found for this ID!"));
 
         personRepository.delete(entity);
+    }
+
+    public PersonVOV2 createV2(PersonVOV2 person) {
+        logger.info("Creating one person!");
+
+        var entity = mapper.convertVoToEntity(person);
+
+        var vo = personRepository.save(entity);
+
+        return mapper.convertEntityToVo(vo);
     }
 }
