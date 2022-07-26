@@ -1,9 +1,10 @@
-package br.com.caduartioli.restspringboot3.services;
+package br.com.caduartioli.restspringboot3.mockito.services;
 
 import br.com.caduartioli.restspringboot3.data.vo.v1.PersonVO;
 import br.com.caduartioli.restspringboot3.exceptions.ResourceObjectIsNullException;
 import br.com.caduartioli.restspringboot3.model.Person;
 import br.com.caduartioli.restspringboot3.repositories.PersonRepository;
+import br.com.caduartioli.restspringboot3.services.PersonServices;
 import br.com.caduartioli.restspringboot3.unittests.mapper.mocks.MockPerson;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
