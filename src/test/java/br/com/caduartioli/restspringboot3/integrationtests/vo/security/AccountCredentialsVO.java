@@ -1,9 +1,12 @@
-package br.com.caduartioli.restspringboot3.data.vo.v1.security;
+package br.com.caduartioli.restspringboot3.integrationtests.vo.security;
+
+import jakarta.xml.bind.annotation.XmlRootElement;
 
 import java.io.Serial;
 import java.io.Serializable;
 import java.util.Objects;
 
+@XmlRootElement
 public class AccountCredentialsVO implements Serializable {
 
     @Serial
