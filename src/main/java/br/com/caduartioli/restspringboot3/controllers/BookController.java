@@ -83,7 +83,7 @@ public class BookController {
     }
 
     @PutMapping(consumes = {MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML, MediaType.APPLICATION_YML},
-            produces = {MediaType.APPLICATION_XML, MediaType.APPLICATION_XML, MediaType.APPLICATION_YML})
+            produces = {MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML, MediaType.APPLICATION_YML})
     @Operation(summary = "Updates a Book",
             description = "Updates a Book by passing in a JSON, XML or YML representation of the book!",
             tags = {"People"},

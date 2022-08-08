@@ -159,6 +159,47 @@ public class PersonControllerYamlTest extends AbstractIntegrationTest {
 
     @Test
     @Order(3)
+    public void testDisablePersonById() {
+        var persistedPerson = given().spec(specification)
+                .config(
+                        RestAssuredConfig
+                                .config()
+                                .encoderConfig(EncoderConfig.encoderConfig()
+                                        .encodeContentTypeAs(
+                                                TestConfigs.CONTENT_TYPE_YML,
+                                                ContentType.TEXT)))
+                .contentType(TestConfigs.CONTENT_TYPE_YML)
+                .accept(TestConfigs.CONTENT_TYPE_YML)
+                .pathParam("id", person.getId())
+                .when()
+                .patch("{id}")
+                .then()
+                .statusCode(200)
+                .extract()
+                .body()
+                .as(PersonVO.class, objectMapper);
+
+        person = persistedPerson;
+
+        Assertions.assertNotNull(persistedPerson);
+
+        Assertions.assertNotNull(persistedPerson.getId());
+        Assertions.assertNotNull(persistedPerson.getFirstName());
+        Assertions.assertNotNull(persistedPerson.getLastName());
+        Assertions.assertNotNull(persistedPerson.getAddress());
+        Assertions.assertNotNull(persistedPerson.getGender());
+        Assertions.assertFalse(persistedPerson.getEnabled());
+
+        Assertions.assertEquals(person.getId(), persistedPerson.getId());
+
+        Assertions.assertEquals("Nelson", persistedPerson.getFirstName());
+        Assertions.assertEquals("Piquet Souto Maior", persistedPerson.getLastName());
+        Assertions.assertEquals("Brasília - DF - Brasil", persistedPerson.getAddress());
+        Assertions.assertEquals("Male", persistedPerson.getGender());
+    }
+
+    @Test
+    @Order(4)
     public void testFindById() {
         mockPerson();
 
@@ -200,7 +241,7 @@ public class PersonControllerYamlTest extends AbstractIntegrationTest {
     }
 
     @Test
-    @Order(4)
+    @Order(5)
     public void testDelete() {
 
         given().spec(specification)
@@ -221,7 +262,7 @@ public class PersonControllerYamlTest extends AbstractIntegrationTest {
     }
 
     @Test
-    @Order(5)
+    @Order(6)
     public void testFindAll() {
 
         var content = given().spec(specification)
@@ -254,30 +295,31 @@ public class PersonControllerYamlTest extends AbstractIntegrationTest {
 
         Assertions.assertEquals(1, foundPersonOne.getId());
 
-        Assertions.assertEquals("Ayrton", foundPersonOne.getFirstName());
-        Assertions.assertEquals("Senna", foundPersonOne.getLastName());
-        Assertions.assertEquals("São Paulo", foundPersonOne.getAddress());
+        Assertions.assertEquals("Leandro", foundPersonOne.getFirstName());
+        Assertions.assertEquals("Costa", foundPersonOne.getLastName());
+        Assertions.assertEquals("Uberlândia - Minas Gerais - Brasil", foundPersonOne.getAddress());
         Assertions.assertEquals("Male", foundPersonOne.getGender());
 
-        PersonVO foundPersonSix = people.get(5);
+        PersonVO foundPersonSix = people.get(4);
 
         Assertions.assertNotNull(foundPersonSix.getId());
         Assertions.assertNotNull(foundPersonSix.getFirstName());
         Assertions.assertNotNull(foundPersonSix.getLastName());
         Assertions.assertNotNull(foundPersonSix.getAddress());
         Assertions.assertNotNull(foundPersonSix.getGender());
+        Assertions.assertTrue(foundPersonSix.getEnabled());
 
         Assertions.assertEquals(9, foundPersonSix.getId());
 
-        Assertions.assertEquals("Nelson", foundPersonSix.getFirstName());
-        Assertions.assertEquals("Mvezo", foundPersonSix.getLastName());
-        Assertions.assertEquals("Mvezo – South Africa", foundPersonSix.getAddress());
+        Assertions.assertEquals("Marcos", foundPersonSix.getFirstName());
+        Assertions.assertEquals("Paulo", foundPersonSix.getLastName());
+        Assertions.assertEquals("Patos de Minas - Minas Gerais - Brasil", foundPersonSix.getAddress());
         Assertions.assertEquals("Male", foundPersonSix.getGender());
     }
 
 
     @Test
-    @Order(6)
+    @Order(7)
     public void testFindAllWithoutToken() {
 
         RequestSpecification specificationWithoutToken = new RequestSpecBuilder()
@@ -308,5 +350,6 @@ public class PersonControllerYamlTest extends AbstractIntegrationTest {
         person.setLastName("Piquet");
         person.setAddress("Brasília - DF - Brasil");
         person.setGender("Male");
+        person.setEnabled(true);
     }
 }
