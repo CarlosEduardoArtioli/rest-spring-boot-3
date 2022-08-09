@@ -3,8 +3,10 @@ package br.com.caduartioli.restspringboot3.integrationtests.controller.withxml;
 import br.com.caduartioli.restspringboot3.configs.TestConfigs;
 import br.com.caduartioli.restspringboot3.integrationtests.testcontainers.AbstractIntegrationTest;
 import br.com.caduartioli.restspringboot3.integrationtests.vo.PersonVO;
+import br.com.caduartioli.restspringboot3.integrationtests.vo.pagemodels.PagedModelPerson;
 import br.com.caduartioli.restspringboot3.integrationtests.vo.security.AccountCredentialsVO;
 import br.com.caduartioli.restspringboot3.integrationtests.vo.security.TokenVO;
+import br.com.caduartioli.restspringboot3.integrationtests.vo.wrappers.WrapperPersonVO;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.DeserializationFeature;
@@ -240,6 +242,7 @@ public class PersonControllerXmlTest extends AbstractIntegrationTest {
         var content = given().spec(specification)
                 .contentType(TestConfigs.CONTENT_TYPE_XML)
                 .accept(TestConfigs.CONTENT_TYPE_XML)
+                .queryParams("page", 3, "size", 10, "direction", "asc")
                 .when()
                 .get()
                 .then()
@@ -248,8 +251,8 @@ public class PersonControllerXmlTest extends AbstractIntegrationTest {
                 .body()
                 .asString();
 
-        List<PersonVO> people = objectMapper.readValue(content, new TypeReference<List<PersonVO>>() {
-        });
+        PagedModelPerson wrapper  = objectMapper.readValue(content, PagedModelPerson.class);
+        var people = wrapper.getContent();
 
         PersonVO foundPersonOne = people.get(0);
 
@@ -260,33 +263,71 @@ public class PersonControllerXmlTest extends AbstractIntegrationTest {
         Assertions.assertNotNull(foundPersonOne.getGender());
         Assertions.assertTrue(foundPersonOne.getEnabled());
 
-        Assertions.assertEquals(1, foundPersonOne.getId());
+        Assertions.assertEquals(676, foundPersonOne.getId());
 
-        Assertions.assertEquals("Leandro", foundPersonOne.getFirstName());
-        Assertions.assertEquals("Costa", foundPersonOne.getLastName());
-        Assertions.assertEquals("Uberlândia - Minas Gerais - Brasil", foundPersonOne.getAddress());
+        Assertions.assertEquals("Alic", foundPersonOne.getFirstName());
+        Assertions.assertEquals("Terbrug", foundPersonOne.getLastName());
+        Assertions.assertEquals("3 Eagle Crest Court", foundPersonOne.getAddress());
         Assertions.assertEquals("Male", foundPersonOne.getGender());
 
-        PersonVO foundPersonSix = people.get(4);
+        PersonVO foundPersonSix = people.get(5);
 
         Assertions.assertNotNull(foundPersonSix.getId());
         Assertions.assertNotNull(foundPersonSix.getFirstName());
         Assertions.assertNotNull(foundPersonSix.getLastName());
         Assertions.assertNotNull(foundPersonSix.getAddress());
         Assertions.assertNotNull(foundPersonSix.getGender());
+
         Assertions.assertTrue(foundPersonSix.getEnabled());
 
-        Assertions.assertEquals(9, foundPersonSix.getId());
+        Assertions.assertEquals(910, foundPersonSix.getId());
 
-        Assertions.assertEquals("Marcos", foundPersonSix.getFirstName());
-        Assertions.assertEquals("Paulo", foundPersonSix.getLastName());
-        Assertions.assertEquals("Patos de Minas - Minas Gerais - Brasil", foundPersonSix.getAddress());
-        Assertions.assertEquals("Male", foundPersonSix.getGender());
+        Assertions.assertEquals("Allegra", foundPersonSix.getFirstName());
+        Assertions.assertEquals("Dome", foundPersonSix.getLastName());
+        Assertions.assertEquals("57 Roxbury Pass", foundPersonSix.getAddress());
+        Assertions.assertEquals("Female", foundPersonSix.getGender());
     }
-
 
     @Test
     @Order(7)
+    public void testFindByName() throws JsonProcessingException {
+
+        var content = given().spec(specification)
+                .contentType(TestConfigs.CONTENT_TYPE_XML)
+                .accept(TestConfigs.CONTENT_TYPE_XML)
+                .pathParam("firstName", "ay")
+                .queryParams("page", 0, "size", 6, "direction", "asc")
+                .when()
+                .get("/findPersonByName/{firstName}")
+                .then()
+                .statusCode(200)
+                .extract()
+                .body()
+                .asString();
+
+        PagedModelPerson wrapper = objectMapper.readValue(content, PagedModelPerson.class);
+        var people = wrapper.getContent();
+
+        PersonVO foundPersonOne = people.get(0);
+
+        Assertions.assertNotNull(foundPersonOne.getId());
+        Assertions.assertNotNull(foundPersonOne.getFirstName());
+        Assertions.assertNotNull(foundPersonOne.getLastName());
+        Assertions.assertNotNull(foundPersonOne.getAddress());
+        Assertions.assertNotNull(foundPersonOne.getGender());
+
+        Assertions.assertFalse(foundPersonOne.getEnabled());
+
+        Assertions.assertEquals(291, foundPersonOne.getId());
+
+        Assertions.assertEquals("Clayton", foundPersonOne.getFirstName());
+        Assertions.assertEquals("Matveiko", foundPersonOne.getLastName());
+        Assertions.assertEquals("92 Sunfield Street", foundPersonOne.getAddress());
+        Assertions.assertEquals("Male", foundPersonOne.getGender());
+    }
+
+    @Test
+    @Order(8)
     public void testFindAllWithoutToken() {
 
         RequestSpecification specificationWithoutToken = new RequestSpecBuilder()

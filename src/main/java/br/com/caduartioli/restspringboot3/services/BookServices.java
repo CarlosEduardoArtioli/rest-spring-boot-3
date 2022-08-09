@@ -1,13 +1,20 @@
 package br.com.caduartioli.restspringboot3.services;
 
 import br.com.caduartioli.restspringboot3.controllers.BookController;
+import br.com.caduartioli.restspringboot3.controllers.PersonController;
 import br.com.caduartioli.restspringboot3.data.vo.v1.BookVO;
+import br.com.caduartioli.restspringboot3.data.vo.v1.PersonVO;
 import br.com.caduartioli.restspringboot3.exceptions.ResourceNotFoundException;
 import br.com.caduartioli.restspringboot3.exceptions.ResourceObjectIsNullException;
 import br.com.caduartioli.restspringboot3.mapper.DozerMapper;
 import br.com.caduartioli.restspringboot3.model.Book;
 import br.com.caduartioli.restspringboot3.repositories.BookRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.web.PagedResourcesAssembler;
+import org.springframework.hateoas.EntityModel;
+import org.springframework.hateoas.Link;
+import org.springframework.hateoas.PagedModel;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -23,12 +30,21 @@ public class BookServices {
     @Autowired
     BookRepository repository;
 
-    public List<BookVO> findAll() {
+    @Autowired
+    PagedResourcesAssembler<BookVO> assembler;
+
+    public PagedModel<EntityModel<BookVO>> findAll(Pageable pageable) {
         logger.info("Finding all books!");
 
-        var books = DozerMapper.parseListObjects(repository.findAll(), BookVO.class);
-        books.forEach(bookVO -> bookVO.add(linkTo(methodOn(BookController.class).findById(bookVO.getKey())).withSelfRel()));
-        return books;
+        var bookPage = repository.findAll(pageable);
+
+        var bookVosPage = bookPage.map(book -> DozerMapper.parseObject(book, BookVO.class));
+        bookVosPage.map(bookVO -> bookVO.add(linkTo(methodOn(BookController.class).findById(bookVO.getKey())).withSelfRel()));
+
+        Link link = linkTo(methodOn(BookController.class)
+                .findAll(pageable.getPageNumber(), pageable.getPageSize(), "asc"))
+                .withSelfRel();
+        return assembler.toModel(bookVosPage, link);
     }
 
     public BookVO findById(Long id) {
