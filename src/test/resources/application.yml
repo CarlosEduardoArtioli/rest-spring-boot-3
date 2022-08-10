@@ -3,7 +3,7 @@ cors:
 server:
   port: 8888
 file:
-  upload-dir: /Users/cadua/Downloads
+  upload-dir: /home/runner/work/rest-spring-boot-3/UploadDir
 security:
   jwt:
     token:
